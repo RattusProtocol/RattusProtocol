@@ -47,8 +47,8 @@ Our laboratory currently features compounds from various sci-fi universes (refer
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/rattus-metamorphosis-protocol.git
-cd rattus-metamorphosis-protocol
+git clone https://github.com/RattusProtocol/RattusProtocol.git
+cd RattusProtocol
 ```
 
 2. Install dependencies:
@@ -59,10 +59,10 @@ npm install
 
 3. Create a `.env` file with required environment variables:
 
+```
 NEXT_PUBLIC_HELIUS_RPC_URL=your_helius_rpc_url
 NEXT_PUBLIC_HELIUS_WS_URL=your_helius_ws_url
 NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=your_token_address
-
 ```
 
 4. Start the development server:
