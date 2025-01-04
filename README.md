@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# RATTUS METAMORPHOSIS PROTOCOL (RMP)
 
-## Getting Started
+A sci-fi rat experiment simulator featuring crypto-linked compound injections and genetic mutations.
 
-First, run the development server:
+![Project Status](https://img.shields.io/badge/status-experimental-purple)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🧬 Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+RMP is a sophisticated laboratory simulation platform that explores the effects of various sci-fi compounds on experimental rat subjects. The project combines real-time market data with genetic mutations, quantum analysis, and behavioral patterns.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Real-time rat behavior simulation with compound effects
+- Crypto market-linked mutation triggers
+- Advanced visualization of genetic modifications
+- Multiple compound types from popular sci-fi universes
+- Dynamic ability unlocking system based on market performance
 
-## Learn More
+## 🧪 Available Compounds
 
-To learn more about Next.js, take a look at the following resources:
+Our laboratory currently features compounds from various sci-fi universes (reference: 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Super Soldier Serum (Marvel Universe)
+- Compound V (The Boys)
+- Venom Symbiote (Marvel Universe)
+- Titan Serum (Attack on Titan)
+- Polyjuice Potion (Harry Potter)
+- Lizard Serum (Spider-Man)
+- Trial of the Grasses (The Witcher)
+- T-Virus (Resident Evil)
+- Extremis Virus (Iron Man)
+- Plasmid (BioShock)
+- And more...
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### Prerequisites
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Node.js (v18 or higher)
+- npm/yarn
+- A modern web browser
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+
+1. Clone the repository:
