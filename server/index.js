@@ -49,10 +49,44 @@ app.get('/api/highest-marketcap', (req, res) => {
 io.on('connection', (socket) => {
   console.log('Client connected, ID:', socket.id);
   
+  // Send current state to new clients
+  socket.emit('wager_update', {
+    wagers: globalWagers,
+    totalWagered
+  });
+
+  socket.on('new_wager', (data) => {
+    const { walletAddress, ratId, amount } = data;
+    
+    // Update global state
+    globalWagers = {
+      ...globalWagers,
+      [walletAddress]: {
+        ...globalWagers[walletAddress],
+        [ratId]: (globalWagers[walletAddress]?.[ratId] || 0) + amount
+      }
+    };
+    
+    // Calculate new total
+    totalWagered = Object.values(globalWagers).reduce((total, walletWagers) => {
+      return total + Object.values(walletWagers).reduce((a, b) => a + b, 0);
+    }, 0);
+    
+    // Broadcast to all clients
+    io.emit('wager_update', {
+      wagers: globalWagers,
+      totalWagered
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected, ID:', socket.id);
   });
 });
+
+// Store for all wagers
+let globalWagers = {};
+let totalWagered = 0;
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

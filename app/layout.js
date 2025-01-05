@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import WalletContextProvider from './components/WalletContextProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Rat Experiment Simulator",
-  description: "Sci-fi rat experiment simulator with crypto-linked compound injections",
+  title: "Rattus",
+  description: "Creating the future of super-rats genetic engineering"
 };
 
 export default function RootLayout({ children }) {
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <WalletContextProvider>
+          {children}
+        </WalletContextProvider>
         <Toaster
           position="top-right"
           toastOptions={{

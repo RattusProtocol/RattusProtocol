@@ -9,10 +9,7 @@ class MarketCapTracker {
   constructor(io) {
     this.io = io;
     this.tokenAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
-    this.connection = new Connection(process.env.NEXT_PUBLIC_HELIUS_RPC_URL, {
-      wsEndpoint: process.env.NEXT_PUBLIC_HELIUS_WS_URL,
-      commitment: 'confirmed'
-    });
+    this.connection = new Connection(process.env.NEXT_PUBLIC_HELIUS_RPC_URL);
     this.tokenData = {
       lastPrice: 0,
       supply: 0,
@@ -22,11 +19,9 @@ class MarketCapTracker {
       metadata: null
     };
     this.highestMarketCap = 0;
-    this.lastUpdate = Date.now();
-    this.retryDelay = 1000;
-    this.solPrice = 200;
-    this.subscription = null;
+    this.lastSignature = null;
     this.isProcessing = false;
+    this.solPrice = 200;
     this.startTracking();
     this.startSolPriceTracking();
   }
@@ -55,46 +50,43 @@ class MarketCapTracker {
       return;
     }
 
-    try {
-      console.log('Starting tracking for token:', this.tokenAddress);
+    console.log('Starting tracking for token:', this.tokenAddress);
+    
+    // Poll for new transactions every 1.5 seconds
+    setInterval(async () => {
+      if (this.isProcessing) return;
       
-      // Subscribe to logs that mention our token
-      this.subscription = this.connection.onLogs(
-        new PublicKey(this.tokenAddress),
-        async (logs, context) => {
-          if (this.isProcessing) {
-            console.log('Skipping transaction - already processing');
-            return;
-          }
+      try {
+        this.isProcessing = true;
+        
+        // Get latest signature
+        const signatures = await this.connection.getSignaturesForAddress(
+          new PublicKey(this.tokenAddress),
+          { limit: 1 }
+        );
 
-          try {
-            this.isProcessing = true;
-            console.log('Processing new transaction');
-            
-            const transaction = await this.connection.getParsedTransaction(
-              logs.signature,
-              {
-                maxSupportedTransactionVersion: 10
-              }
-            );
-
-            if (transaction) {
-              await this.processTransaction(transaction);
+        if (signatures.length > 0 && signatures[0].signature !== this.lastSignature) {
+          this.lastSignature = signatures[0].signature;
+          
+          const transaction = await this.connection.getParsedTransaction(
+            signatures[0].signature,
+            {
+              maxSupportedTransactionVersion: 10
             }
-          } catch (error) {
-            console.error('Error processing log:', error);
-          } finally {
-            this.isProcessing = false;
-          }
-        },
-        'confirmed'
-      );
+          );
 
-      console.log('Log subscription started');
-    } catch (error) {
-      console.error('Error starting tracking:', error);
-      this.isProcessing = false;
-    }
+          if (transaction) {
+            await this.processTransaction(transaction);
+          }
+        }
+      } catch (error) {
+        console.error('Error polling transaction:', error);
+      } finally {
+        this.isProcessing = false;
+      }
+    }, 1500);
+
+    console.log('Transaction polling started');
   }
 
   async processTransaction(transaction) {
