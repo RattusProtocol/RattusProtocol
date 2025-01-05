@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function Header() {
   const [copied, setCopied] = useState(false);
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+  const contractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
   const twitterHandle = process.env.NEXT_PUBLIC_TWITTER_HANDLE;
   
   const copyToClipboard = async () => {
