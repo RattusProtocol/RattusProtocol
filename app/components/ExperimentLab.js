@@ -6,6 +6,7 @@ import AnalysisButtons from './AnalysisButtons';
 import RatList from './RatList';
 import StatusPanel from './StatusPanel';
 import { useMarketCap } from '../hooks/useMarketCap';
+import ProjectPhases from './ProjectPhases';
 
 const SIMULATED_MARKET_CAP = {
   value: 1000000000,
@@ -154,6 +155,9 @@ export default function ExperimentLab() {
             <StatusPanel analysisData={analysisData} />
           </div>
         </div>
+
+        {/* Project Phases Section */}
+        <ProjectPhases />
       </div>
     </div>
   );
