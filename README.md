@@ -1,4 +1,4 @@
-# RATTUS METAMORPHOSIS PROTOCOL (RMP)
+# RATTUS PROTOCOL
 
 A sci-fi rat experiment simulator featuring crypto-linked compound injections and genetic mutations.
 
@@ -8,7 +8,7 @@ A sci-fi rat experiment simulator featuring crypto-linked compound injections an
 
 ## 🧬 Overview
 
-RMP is a sophisticated laboratory simulation platform that explores the effects of various sci-fi compounds on experimental rat subjects. The project combines real-time market data with genetic mutations, quantum analysis, and behavioral patterns.
+RATTUS PROTOCOL is a sophisticated laboratory simulation platform that explores the effects of various sci-fi compounds on experimental rat subjects. The project combines real-time market data with genetic mutations, quantum analysis, and behavioral patterns.
 
 ### Key Features
 
