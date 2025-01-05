@@ -247,6 +247,8 @@ export class Rat {
     this.tongueGrowthRate = 0.002; // Slow growth rate
     this.lastTongueGrowthTime = Date.now();
     this.isInitialLoad = true;
+    this.attackCooldown = 2000; // 2 seconds between attacks
+    this.currentAttackType = 0; // 0: Laser, 1: Electric, 2: Fire
   }
 
   static fromState(state, marketData = null) {
@@ -503,37 +505,25 @@ export class Rat {
       this.webPoint = null;
     }
 
-    if (this.compound === 'COMPOUND_V') {
-      // Update cape angle based on movement
-      this.capeAngle = Math.atan2(this.velocity.y, this.velocity.x) + Math.PI + 
-        Math.sin(Date.now() / 300) * 0.3;
-
-      // Check if it's time for next attack
-      const currentTime = Date.now();
-      const attackDuration = 2500; // 2.5 seconds
-      const attackInterval = 5000; // 5 seconds (2.5s attack + 2.5s pause)
-
-      // Use stored values for ability checks
-      const availableAttacks = [];
-      if (this.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.LASER.target) availableAttacks.push(0);
-      if (this.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.FIRE.target) availableAttacks.push(2);
-      if (this.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.ELECTRIC.target) availableAttacks.push(1);
-
-      if (currentTime - this.lastAttackTime > attackInterval && availableAttacks.length > 0) {
-        // Start new attack cycle
-        this.lastAttackTime = currentTime;
+    if (this.compound === 'COMPOUND_V' && this.active) {
+      const attackDuration = 1000; // 1 second attack duration
+      
+      // Check if we can attack
+      if (currentTime - this.lastAttackTime > this.attackCooldown) {
+        // Cycle through available attacks
+        if (this.unlockedAbilities.electric && this.unlockedAbilities.fire) {
+          // Both abilities unlocked - cycle through all three
+          this.currentAttackType = (this.currentAttackType + 1) % 3;
+        } else if (this.unlockedAbilities.electric) {
+          // Only electric unlocked - alternate between laser and electric
+          this.currentAttackType = this.currentAttackType === 0 ? 1 : 0;
+        } else if (this.unlockedAbilities.fire) {
+          // Only fire unlocked - alternate between laser and fire
+          this.currentAttackType = this.currentAttackType === 0 ? 2 : 0;
+        }
         
-        // Reset all states
-        this.isFireingLaser = false;
-        this.isElectricAura = false;
-        this.isAuraActive = false;
-        this.isFireAuraActive = false;
-        
-        // Pick from available attacks only
-        this.currentAttackState = availableAttacks[Math.floor(Math.random() * availableAttacks.length)];
-        
-        // Set new attack based on cycle
-        switch(this.currentAttackState) {
+        // Start the attack
+        switch(this.currentAttackType) {
           case 0: // Laser
             this.isFireingLaser = true;
             break;
@@ -545,12 +535,14 @@ export class Rat {
             this.isFireAuraActive = true;
             break;
         }
+        
+        this.lastAttackTime = currentTime;
       } else if (currentTime - this.lastAttackTime > attackDuration) {
         // End current attack
         this.isFireingLaser = false;
         this.isElectricAura = false;
-        this.isAuraActive = false;
         this.isFireAuraActive = false;
+        this.isAuraActive = false;
       }
     }
 
