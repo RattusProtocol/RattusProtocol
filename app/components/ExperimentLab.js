@@ -130,7 +130,7 @@ export default function ExperimentLab() {
   };
 
   return (
-    <div className="min-h-screen grid-background relative">
+    <div className="min-h-screen grid-background relative p-4 md:p-6 lg:p-8">
       <div className="max-w-[98%] mx-auto p-3 space-y-4">
         {/* Analysis Tools Section */}
         <div className="bg-[#1a0033]/80 rounded-lg border border-purple-700/20 

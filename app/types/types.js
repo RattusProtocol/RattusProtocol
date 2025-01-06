@@ -1,4 +1,5 @@
 import { ABILITY_TARGETS } from '../constants/abilities';
+import { toast } from 'react-hot-toast';
 
 export const COMPOUNDS = {
   COMPOUND_V: {
@@ -245,6 +246,7 @@ export class Rat {
     this.maxTongueLength = 2; // 2 centimeters max
     this.tongueGrowthRate = 0.002; // Slow growth rate
     this.lastTongueGrowthTime = Date.now();
+    this.isInitialLoad = true;
   }
 
   static fromState(state, marketData = null) {
@@ -260,85 +262,65 @@ export class Rat {
   }
 
   applyCompoundEffects(marketData) {
-    if (!this.compound || !marketData) return;
-    const marketCapMultiplier = Math.log10(marketData.marketCap) / 10;
+    const marketCapMultiplier = Math.min(marketData.highestMarketCap / 1e9, 1);
+    const scaledMarketCap = marketData.highestMarketCap;
     
-    // Update unlocked abilities based on compound and market cap
-    switch(this.compound) {
-      case 'COMPOUND_V':
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.FIRE.target) {
-          this.unlockedAbilities.fire = true;
-        }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.ELECTRIC.target) {
-          this.unlockedAbilities.electric = true;
-        }
-        break;
-        
-      case 'SUPER_SOLDIER_SERUM':
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.SUPER_SOLDIER_SERUM.AGILITY.target) {
-          this.unlockedAbilities.agility = true;
-        }
-        break;
-        
-      case 'TITAN_SERUM':
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.TITAN_SERUM.SIZE.target) {
-          this.unlockedAbilities.size = true;
-          // Set initial size when ability is first unlocked
-          if (this.size === this.initialSize) {
-            this.size = this.initialSize + (marketCapMultiplier * this.dosage);
-          }
-        }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.TITAN_SERUM.REGENERATION.target) {
-          this.unlockedAbilities.regeneration = true;
-        }
-        break;
-    }
-    
-    // Store both current and highest market caps
-    this.lastMarketCap = marketData.marketCap;
-    this.highestMarketCap = marketData.highestMarketCap;
+    // Store previous unlock states
+    const previousUnlocks = { ...this.unlockedAbilities };
+    const shouldShowToast = !this.isInitialLoad;
 
+    // Apply compound-specific effects
     switch(this.compound) {
       case 'COMPOUND_V':
-        this.size = 10 + (marketCapMultiplier * this.dosage / 2);
+        if (!previousUnlocks.fire && marketData.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.FIRE.target) {
+          this.unlockedAbilities.fire = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [COMPOUND V] unlocked: Fire Ability`);
+        }
+        if (!previousUnlocks.electric && marketData.highestMarketCap >= ABILITY_TARGETS.COMPOUND_V.ELECTRIC.target) {
+          this.unlockedAbilities.electric = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [COMPOUND V] unlocked: Electric Ability`);
+        }
         break;
       case 'VENOM_SYMBIOTE':
         this.size = 10 + (marketCapMultiplier * this.dosage / 2);
         this.isWebSlinging = true;
         
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.VENOM_SYMBIOTE.TONGUE.target) {
+        if (!previousUnlocks.tongue && scaledMarketCap >= ABILITY_TARGETS.VENOM_SYMBIOTE.TONGUE.target) {
           this.unlockedAbilities.tongue = true;
-          // Initialize tongue length if not set
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [VENOM] unlocked: Tongue Ability`);
           if (!this.tongueLength) {
             this.tongueLength = 0;
           }
         }
         
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.VENOM_SYMBIOTE.STRENGTH.target) {
+        if (!previousUnlocks.venomStrength && scaledMarketCap >= ABILITY_TARGETS.VENOM_SYMBIOTE.STRENGTH.target) {
           this.unlockedAbilities.venomStrength = true;
-        }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.VENOM_SYMBIOTE.SHAPE.target) {
-          this.unlockedAbilities.shape = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [VENOM] unlocked: Strength Ability`);
         }
         break;
       case 'POLYJUICE_POTION':
         if (!this.isTransformed) {
           this.size = 10 + (marketCapMultiplier * this.dosage / 2);
         }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_CAPTAIN.target) {
+        if (!previousUnlocks.shapeshift_captain && marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_CAPTAIN.target) {
           this.unlockedAbilities.shapeshift_captain = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [POLYJUICE] unlocked: Captain Transformation`);
         }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_LIZARD.target) {
+        if (!previousUnlocks.shapeshift_lizard && marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_LIZARD.target) {
           this.unlockedAbilities.shapeshift_lizard = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [POLYJUICE] unlocked: Lizard Transformation`);
         }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_WITCHER.target) {
+        if (!previousUnlocks.shapeshift_witcher && marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_WITCHER.target) {
           this.unlockedAbilities.shapeshift_witcher = true;
-        }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_COMPOUND_V.target) {
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [POLYJUICE] unlocked: Witcher Transformation`);
+        } 
+        if (!previousUnlocks.shapeshift_compound_v && marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_COMPOUND_V.target) {
           this.unlockedAbilities.shapeshift_compound_v = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [POLYJUICE] unlocked: Compound V Transformation`); 
         }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_TITAN.target) {
+        if (!previousUnlocks.shapeshift_titan && marketData.highestMarketCap >= ABILITY_TARGETS.POLYJUICE_POTION.SHAPESHIFT_TITAN.target) {
           this.unlockedAbilities.shapeshift_titan = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [POLYJUICE] unlocked: Titan Transformation`);
         }
         break;
       case 'LIZARD_SERUM':
@@ -346,15 +328,18 @@ export class Rat {
         this.scaleIntensity = Math.min(1, this.dosage / 100);
         this.tailLength = Math.min(4, this.dosage / 25);
         this.color = '#2a5c3c';
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.LIZARD_SERUM.MUTATION.target) {
+        if (!previousUnlocks.mutation && marketData.highestMarketCap >= ABILITY_TARGETS.LIZARD_SERUM.MUTATION.target) {
           this.unlockedAbilities.mutation = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [LIZARD] unlocked: Mutation`);
         }
-        if (marketData.highestMarketCap >= ABILITY_TARGETS.LIZARD_SERUM.SIZE.target) {
+        if (!previousUnlocks.lizardSize && marketData.highestMarketCap >= ABILITY_TARGETS.LIZARD_SERUM.SIZE.target) {
           this.unlockedAbilities.lizardSize = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [LIZARD] unlocked: Size Increase`);
         }
         break;
       case 'SUPER_SOLDIER_SERUM':
         this.size = 10 + (marketCapMultiplier * this.dosage / 2);
+        
         break;
       case 'TITAN_SERUM':
         // Only apply size calculation if size ability is not unlocked
@@ -367,20 +352,27 @@ export class Rat {
         break;
     }
 
+    // The Grasses abilities
     if (this.compound === 'THE_GRASSES') {
-      if (marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.YRDEN.target) {
+      if (!previousUnlocks.yrden && marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.YRDEN.target) {
         this.unlockedAbilities.yrden = true;
+        shouldShowToast && toast.success(`RAT_${this.id + 1} [WITCHER] unlocked: Yrden Sign`);
       }
-      if (marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.QUEN.target) {
+      if (!previousUnlocks.quen && marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.QUEN.target) {
         this.unlockedAbilities.quen = true;
+        shouldShowToast && toast.success(`RAT_${this.id + 1} [WITCHER] unlocked: Quen Sign`);
       }
-      if (marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.AXII.target) {
+      if (!previousUnlocks.axii && marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.AXII.target) {
         this.unlockedAbilities.axii = true;
+        shouldShowToast && toast.success(`RAT_${this.id + 1} [WITCHER] unlocked: Axii Sign`);
       }
-      if (marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.AARD.target) {
+      if (!previousUnlocks.aard && marketData.highestMarketCap >= ABILITY_TARGETS.THE_GRASSES.AARD.target) {
         this.unlockedAbilities.aard = true;
+        shouldShowToast && toast.success(`RAT_${this.id + 1} [WITCHER] unlocked: Aard Sign`);
       }
     }
+
+    this.isInitialLoad = false;
   }
 
   update(allRats = [], currentTime = Date.now()) {

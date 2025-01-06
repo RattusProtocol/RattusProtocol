@@ -8,7 +8,7 @@ export const ABILITY_TARGETS = {
       FIRE: {
         name: 'Fire Aura',
         target: 100000,
-        description: 'Unlocks at 500k MC'
+        description: 'Unlocks at 100k MC'
       },
       ELECTRIC: {
         name: 'Electric Field',

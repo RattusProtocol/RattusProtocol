@@ -899,9 +899,6 @@ export default function RatList({ rats }) {
                     <div>Potency: {activeRat.originalCompound === 'POLYJUICE_POTION'
                       ? safeFormat(COMPOUNDS['POLYJUICE_POTION'].potency, 2)
                       : safeFormat(COMPOUNDS[activeRat.compound]?.potency, 2) || 'N/A'}</div>
-                    <div>Stability: {activeRat.originalCompound === 'POLYJUICE_POTION'
-                      ? safeFormat(COMPOUNDS['POLYJUICE_POTION'].stability * 100)
-                      : safeFormat(COMPOUNDS[activeRat.compound]?.stability * 100)}%</div>
                     <div className="pt-2 border-t border-purple-700/20">
                       {activeRat.compound && (
                         <CompoundAbilities 
