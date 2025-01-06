@@ -338,11 +338,23 @@ export class Rat {
         }
         break;
       case 'SUPER_SOLDIER_SERUM':
+        if (!previousUnlocks.agility && marketData.highestMarketCap >= ABILITY_TARGETS.SUPER_SOLDIER_SERUM.AGILITY.target) {
+          this.unlockedAbilities.agility = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [SUPER SOLDIER] unlocked: Agility`);
+        }
         this.size = 10 + (marketCapMultiplier * this.dosage / 2);
         
         break;
       case 'TITAN_SERUM':
         // Only apply size calculation if size ability is not unlocked
+        if (!previousUnlocks.size && marketData.highestMarketCap >= ABILITY_TARGETS.TITAN_SERUM.SIZE.target) {
+          this.unlockedAbilities.size = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [TITAN] unlocked: Size Growth`);
+        }
+        if (!previousUnlocks.regeneration && marketData.highestMarketCap >= ABILITY_TARGETS.TITAN_SERUM.REGENERATION.target) {
+          this.unlockedAbilities.regeneration = true;
+          shouldShowToast && toast.success(`RAT_${this.id + 1} [TITAN] unlocked: Regeneration`);
+        }
         if (!this.unlockedAbilities.size) {
           const baseSize = this.initialSize;
           const maxSize = baseSize * this.maxSizeMultiplier;
