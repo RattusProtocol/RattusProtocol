@@ -6,6 +6,14 @@ A sci-fi rat experiment simulator featuring crypto-linked compound injections an
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## 🔗 Links
+
+- [Website](https://rattus.io)
+- [Documentation](https://docs.rattus.io)
+- [Twitter](https://twitter.com/RattusProtocol)
+- [Dev Profil](https://github.com/juliemich88)
+
+
 ## 🧬 Overview
 
 RATTUS PROTOCOL is a sophisticated laboratory simulation platform that explores the effects of various sci-fi compounds on experimental rat subjects. The project combines real-time market data with genetic mutations, quantum analysis, and behavioral patterns.
@@ -75,11 +83,6 @@ npm run dev
 
 ### Experiment Lab
 The main interface for conducting rat experiments and observing mutations. Features real-time analysis of compound effects and behavioral patterns (reference: 
-```javascript:app/components/ExperimentLab.js
-startLine: 15
-endLine: 42
-```
-).
 
 ### Analysis Tools
 - Compound Synthesis Analysis
