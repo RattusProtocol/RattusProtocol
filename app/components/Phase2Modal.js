@@ -18,9 +18,9 @@ export default function Phase2Modal({ isOpen, onClose }) {
             <div className="bg-red-900/20 p-4 rounded border border-red-800">
               <h3 className="text-lg font-semibold text-red-300 mb-2">Unlock Conditions</h3>
               <ul className="list-disc pl-5 text-gray-300">
-                <li>All Phase 1 rats must unlock their complete ability set</li>
-                <li>Market cap must reach predetermined threshold</li>
-                <li>Community voting period must conclude</li>
+                <li>All Phase 1 rats must unlock most of their complete ability set</li>
+                <li>Market cap must reach predetermined threshold (subject to change based on market demand)</li>
+                <li>Period of 30 minutes (subject to change based on market demand)</li>
               </ul>
             </div>
 
@@ -41,6 +41,7 @@ export default function Phase2Modal({ isOpen, onClose }) {
                 <li>Select your champion rat(s)</li>
                 <li>Place wagers using the official token</li>
                 <li>Winners split the prize pool based on their wager percentage</li>
+                <li>5% of the prize pool will be burnt</li>
               </ul>
             </div>
 
