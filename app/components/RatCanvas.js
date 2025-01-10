@@ -1,10 +1,28 @@
 import { useEffect, useRef } from 'react';
 import { COMPOUNDS } from '../types/types';
 
+// Cache trigonometric calculations
+const cosCache = new Float32Array(360);
+const sinCache = new Float32Array(360);
+for (let i = 0; i < 360; i++) {
+  const angle = (i * Math.PI) / 180;
+  cosCache[i] = Math.cos(angle);
+  sinCache[i] = Math.sin(angle);
+}
+
+// Use cached values in drawing functions
+const getTrig = (angle) => {
+  const index = Math.floor((angle * 180) / Math.PI) % 360;
+  return {
+    cos: cosCache[index],
+    sin: sinCache[index]
+  };
+};
+
 export default function RatCanvas({ rats }) {
   const canvasRef = useRef(null);
 
-  const drawRat = (ctx, rat) => {
+  const drawRat = (ctx, rat) => {// Increase velocity by a factor (e.g., 1.5 for 50% faster)
     ctx.save();
     
     const ratColor = rat.compound ? COMPOUNDS[rat.compound].color : '#ffffff';
@@ -765,34 +783,112 @@ export default function RatCanvas({ rats }) {
     ctx.restore();
   };
 
+  const drawGrid = (ctx, width, height) => {
+    ctx.strokeStyle = '#4a008850';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    
+    // Combine vertical lines
+    for (let i = 0; i < width; i += 20) {
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+    }
+    
+    // Combine horizontal lines
+    for (let i = 0; i < height; i += 20) {
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+    }
+    ctx.stroke();
+  };
+
+  const drawScanlines = (ctx, height) => {
+    ctx.fillStyle = '#00000015';
+    for (let y = 0; y < height; y += 4) {
+      ctx.fillRect(0, y, ctx.canvas.width, 2);
+    }
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    
+    // Get initial canvas size
+    const updateCanvasSize = () => {
+      const { width, height } = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.scale(dpr, dpr);
+    };
+    
+    updateCanvasSize();
     
     function animate() {
-      ctx.fillStyle = '#1a0044'; // Dark purple background
+      // Clear canvas
+      ctx.fillStyle = '#1a0044';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Draw grid lines
-      ctx.strokeStyle = '#4a008850'; // Purple grid
-      ctx.lineWidth = 1;
+      // Draw grid and scanlines
+      drawGrid(ctx, canvas.width, canvas.height);
+      drawScanlines(ctx, canvas.height);
       
-      // Add scanlines effect
-      for (let y = 0; y < canvas.height; y += 4) {
-        ctx.fillStyle = '#00000015';
-        ctx.fillRect(0, y, canvas.width, 2);
-      }
-      
-      // Draw rats
+      // Draw rats with adjusted speed
       rats.forEach(rat => {
-        rat.update();
+        if (rat.update) {
+          // Calculate full rat dimensions including body length and width
+          const bodyLength = rat.size * 2;
+          const bodyWidth = rat.size * 1.2;
+          const padding = Math.max(bodyLength, bodyWidth);
+          const rightPadding = padding * 14; // Double padding for right and bottom
+          const bottomPadding = padding * 8; // Double padding for right and bottom
+          
+          // Check boundaries with proper padding
+          if (rat.position.x <= padding) {
+            rat.position.x = padding;
+            rat.velocity.x = Math.abs(rat.velocity.x);
+          } else if (rat.position.x >= canvas.width - rightPadding) {
+            rat.position.x = canvas.width - rightPadding;
+            rat.velocity.x = -Math.abs(rat.velocity.x);
+          }
+          
+          if (rat.position.y <= padding) {
+            rat.position.y = padding;
+            rat.velocity.y = Math.abs(rat.velocity.y);
+          } else if (rat.position.y >= canvas.height - bottomPadding) {
+            rat.position.y = canvas.height - bottomPadding;
+            rat.velocity.y = -Math.abs(rat.velocity.y);
+          }
+
+          // Store original velocity
+          const originalVX = rat.velocity.x;
+          const originalVY = rat.velocity.y;
+          
+          // Apply speed multiplier
+          rat.velocity.x *= 20;
+          rat.velocity.y *= 20;
+          
+          // Update position
+          rat.update();
+          
+          // Restore original velocity
+          rat.velocity.x = originalVX;
+          rat.velocity.y = originalVY;
+        }
         drawRat(ctx, rat);
       });
       
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     }
     
     animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [rats]);
 
   return (
