@@ -7,6 +7,7 @@ import RatList from './RatList';
 import StatusPanel from './StatusPanel';
 import { useMarketCap } from '../hooks/useMarketCap';
 import ProjectPhases from './ProjectPhases';
+import BetaWarningModal from './BetaWarningModal';
 
 const SIMULATED_MARKET_CAP = {
   value: 1000000000,
@@ -44,6 +45,7 @@ export default function ExperimentLab() {
 
   const { marketCap, isLoading, highestMarketCap } = useMarketCap();
   const prevMarketCapRef = useRef(0);
+  const [showBetaWarning, setShowBetaWarning] = useState(true);
 
   // Initialize rats with compounds
   useEffect(() => {
@@ -130,8 +132,17 @@ export default function ExperimentLab() {
     return Math.max(min, Math.min(max, newValue));
   };
 
+  // Add this effect to show the modal on component mount
+  useEffect(() => {
+    setShowBetaWarning(true);
+  }, []);
+
   return (
     <div className="min-h-screen grid-background relative p-4 md:p-6 lg:p-8">
+      <BetaWarningModal 
+        isOpen={showBetaWarning} 
+        onClose={() => setShowBetaWarning(false)} 
+      />
       <div className="max-w-[98%] mx-auto p-3 space-y-4">
         {/* Analysis Tools Section */}
         <div className="bg-[#1a0033]/80 rounded-lg border border-purple-700/20 
